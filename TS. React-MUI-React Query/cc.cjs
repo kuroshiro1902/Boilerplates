@@ -29,15 +29,15 @@ interface props{
 	
 };
 
-function MyComponent(props: props){
+function ${componentName}(props: props){
   return (
     <div>
-      MyComponent component
+      ${componentName} component
     </div>
   )
 };
 
-export default MyComponent;
+export default ${componentName};
 `;
 
 // Kiểm tra và tạo thư mục nếu nó chưa tồn tại
