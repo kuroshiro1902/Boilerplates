@@ -1,6 +1,6 @@
-# Project templates
+# Project Boilerplates
 
-Templates for web apps development (React, Express, Angular, ...).
+Boilerplates for web apps development (React, Express, Angular, ...).
 
 ## Stack
 
