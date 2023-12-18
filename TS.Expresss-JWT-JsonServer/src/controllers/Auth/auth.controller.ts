@@ -23,18 +23,20 @@ class AuthController {
           .json({ message: 'Invalid username or password!' });
       }
 
-      const existedUser = await this.findByUsername(username);
-      if (
-        !existedUser ||
-        existedUser.length < 1 ||
-        !bcrypt.compareSync(password, existedUser[0].password)
-      ) {
+      const user = await this.findOneByUsername(username);
+
+      if (!user) {
+        return res
+          .status(EStatusCode.NOT_FOUND)
+          .json({ message: 'Username not found.' });
+      }
+      if (!bcrypt.compareSync(password, user.password)) {
         return res
           .status(EStatusCode.UNAUTHORIZED)
           .json({ message: 'Wrong password!' });
       }
 
-      const token = jwt.sign({ username }, env.SECRET_KEY!, {
+      const token = jwt.sign(UserDTO(user), env.SECRET_KEY!, {
         expiresIn: tokenLifeTime,
       });
       res.json({ isSuccess: true, data: token });
@@ -51,8 +53,8 @@ class AuthController {
         return res.status(400).json({ message: 'Missing field!' });
       }
 
-      const existedUser = await this.findByUsername(username);
-      if (!!!existedUser || existedUser.length > 0) {
+      const existedUser = await this.findOneByUsername(username);
+      if (existedUser) {
         return res
           .status(EStatusCode.CONFLICT)
           .json({ message: 'User already exists!' });
@@ -72,11 +74,12 @@ class AuthController {
     }
   }
 
-  private async findByUsername(username: string) {
+  private async findOneByUsername(username: string) {
     const res = await axios.get<IUser[]>(
       authDbPath + paramsSerialize({ username })
     );
-    return res.data;
+    if (res.data.length < 1) return null;
+    return res.data[0];
   }
 }
 
